@@ -186,7 +186,7 @@ func (p *SpanData) Dump(w io.Writer, readable bool, maxKeyLen int) (err error) {
 	sort.Strings(keys)
 	for _, k := range keys {
 		if readable {
-			_, err = w.Write([]byte(fmt.Sprintf("%s: %s\n", base.Rpad(k, maxKeyLen), p.Data[k].Dump(readable))))
+			_, err = w.Write([]byte(fmt.Sprintf("%s %s\n", base.Rpad(k, maxKeyLen), p.Data[k].Dump(readable))))
 		} else {
 			_, err = w.Write([]byte(fmt.Sprintf("%s %s\n", k, p.Data[k].Dump(readable))))
 		}
