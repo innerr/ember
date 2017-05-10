@@ -89,12 +89,12 @@ func (p *MeasureData) After(time int64) MeasureData {
 	}
 
 	for ; i >= 0; i-- {
-		if data[i].Time == time {
+		if data[i].Time <= time {
 			break
 		}
 	}
 
-	after := MeasureData(data[i:])
+	after := MeasureData(data[i + 1:])
 	return after.Copy()
 }
 
@@ -110,13 +110,17 @@ func (p *MeasureData) LastTime() int64 {
 	return (*p)[len(*p) - 1].Time
 }
 
-func (p *MeasureData) Padding(count int) {
+func (p *MeasureData) Padding(count int, interval int64) {
 	data := *p
+	time := data[len(data) - 1].Time
 	if count >= len(data) {
 		*p = NewMeasureData(len(data))
 	} else {
 		for i := 0; i < count; i++ {
-			*p = append(*p, NewSpanData())
+			n := NewSpanData()
+			n.Time = time + interval
+			time = n.Time
+			*p = append(*p, n)
 		}
 		*p = (*p)[count:]
 	}

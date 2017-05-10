@@ -24,8 +24,8 @@ func (p *Measure) Record(name string, value int64) {
 
 	now := p.round(time.Now().UnixNano())
 	last := p.data.LastTime()
-	if last < now {
-		p.data.Padding(int((now - last) / p.interval))
+	if last != 0 && last < now {
+		p.data.Padding(int((now - last) / p.interval), p.interval)
 	}
 	p.data.Record(now, name, value)
 }
