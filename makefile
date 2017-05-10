@@ -1,8 +1,6 @@
-.PHONY: server test all
+.PHONY: all test
 
-all: server test
-
-server:
+all:
 	go clean ./...
 	go install -v ./...
 
