@@ -1,15 +1,36 @@
-package main
+package server
 
 import (
 	"errors"
 	"os"
-	"ember/cli"
+	"strconv"
+	"net/http"
+	"ember/http/rpc"
 )
 
-func main() {
-	hub := cli.NewRpcHub(os.Args[1:], NewServer, &Client{}, "/")
-	err := hub.Run()
-	cli.Check(err)
+func Main() {
+	err := run(DemoBindingPort)
+	if err != nil {
+		println(err.Error())
+		os.Exit(-1)
+	}
+}
+
+func run(port int) (err error) {
+	server := NewServer()
+
+	rpc := rpc.NewServer()
+	err = rpc.Reg(server, &Client{})
+	if err != nil {
+		return
+	}
+
+	// both way works:
+
+	return rpc.Run("/", port)
+
+	http.HandleFunc("/", rpc.Serve)
+	return http.ListenAndServe(":" + strconv.Itoa(port), nil)
 }
 
 type Client struct {
@@ -34,14 +55,16 @@ func (p *Server) Error() (err error) {
 	return
 }
 
-func NewServer(args []string) (p interface{}, err error) {
+func NewServer() (p *Server) {
 	p = &Server{}
 	return
 }
 
 func (p *Server) Foo(key string) (ret [][][]string, err error) {
-	ret = [][][]string{{{"foo"}}}
+	ret = [][][]string{{{"you are a fool"}}}
 	return
 }
 
 type Server struct{}
+
+const DemoBindingPort = 8899

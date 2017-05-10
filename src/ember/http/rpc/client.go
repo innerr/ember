@@ -12,7 +12,7 @@ import (
 )
 
 func (p *Client) Reg(obj interface{}) (err error) {
-	return p.reg("", obj)
+	return p.RegEx("", obj)
 }
 
 func (p *Client) List() (fns []FnProto) {
@@ -66,7 +66,7 @@ func (p *Client) Call(name string, args []string) (ret []interface{}, err error)
 	return fn.Call(in)
 }
 
-func (p *Client) reg(prefix string, obj interface{}) (err error) {
+func (p *Client) RegEx(prefix string, obj interface{}) (err error) {
 	fns := NewFnTraits(obj)
 	for origin, fn := range fns {
 		name := prefix + origin
@@ -91,12 +91,12 @@ func NewClient(addr string) (p *Client) {
 
 	p = &Client{addr: addr, fns: make(FnTraits)}
 
-	err := p.reg(MeasurePrefix, &p.Measure)
+	err := p.RegEx(MeasurePrefix, &p.Measure)
 	if err != nil {
 		panic(err)
 	}
 
-	err = p.reg(BuiltinPrefix, &p.Builtin)
+	err = p.RegEx(BuiltinPrefix, &p.Builtin)
 	if err != nil {
 		panic(err)
 	}
@@ -121,5 +121,5 @@ type Builtin struct {
 
 var ErrApiExists = errors.New("api registered")
 
-const  MeasurePrefix = "Measure."
-const  BuiltinPrefix = "Builtin."
+const MeasurePrefix = "Measure."
+const BuiltinPrefix = "Builtin."

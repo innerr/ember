@@ -30,9 +30,9 @@ func (p *Server) Serve(w http.ResponseWriter, r *http.Request) {
 	var err error
 	defer func() {
 		end := time.Now().UnixNano()
-		p.measure.Record("api.cost.handle." + name, (cost - begin) / 1000)
-		p.measure.Record("api.cost.all." + name, (end - begin) / 1000)
-		p.measure.Record("api.resp." + name, int64(cb))
+		p.measure.Record("api.microsec.intenal." + name, (cost - begin) / 1000)
+		p.measure.Record("api.microsec.all." + name, (end - begin) / 1000)
+		p.measure.Record("api.bytes." + name, int64(cb))
 		if err != nil {
 			p.measure.Record("api.error." + name, 0)
 		}
@@ -114,6 +114,10 @@ func format(fn *FnTrait, result []interface{}) (m map[string]interface{}) {
 	return
 }
 
+func (p *Server) GetMeasure() *measure.Measure {
+	return p.measure
+}
+
 func (p *Server) Uptime() (start int64, dura int64, err error) {
 	now := time.Now().UnixNano()
 	start = p.start / int64(time.Second)
@@ -153,6 +157,10 @@ func (p *Server) reg(prefix string, sobj interface{}, cobj interface{}) (err err
 }
 
 func NewServer() (p *Server) {
+	return NewServerEx(true, true)
+}
+
+func NewServerEx(exportBuiltinApi bool, exportMeasureApi bool) (p *Server) {
 	p = &Server {
 		make(FnTraits),
 		make(FnValues),
@@ -160,15 +168,20 @@ func NewServer() (p *Server) {
 		time.Now().UnixNano(),
 	}
 
-	err := p.reg(MeasurePrefix, p.measure, &Measure{})
-	if err != nil {
-		panic(err)
+	if exportMeasureApi {
+		err := p.reg(MeasurePrefix, p.measure, &Measure{})
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	err = p.reg(BuiltinPrefix, p, &Builtin{})
-	if err != nil {
-		panic(err)
+	if exportBuiltinApi {
+		err := p.reg(BuiltinPrefix, p, &Builtin{})
+		if err != nil {
+			panic(err)
+		}
 	}
+
 	return
 }
 

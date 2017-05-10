@@ -34,6 +34,11 @@ func (p *Measure) round(time int64) int64 {
 	return time / p.interval * p.interval
 }
 
+func (p *Measure) SetInterval(interval time.Duration, keep time.Duration) {
+	p.interval = int64(interval)
+	p.data = NewMeasureData(int(keep / interval))
+}
+
 func NewMeasure(interval time.Duration, keep time.Duration) *Measure {
 	return &Measure {
 		interval: int64(interval),

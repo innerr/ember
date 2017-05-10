@@ -10,13 +10,13 @@ import (
 	"ember/base"
 )
 
-func (p *MeasureData) Print(readable bool) (err error) {
-	return p.Dump(os.Stdout, readable)
+func (p *MeasureData) PrintReadable(maxKeyLen int) (err error) {
+	return p.Dump(os.Stdout, true, maxKeyLen)
 }
 
-func (p *MeasureData) Dump(w io.Writer, readable bool) (err error) {
+func (p *MeasureData) Dump(w io.Writer, readable bool, maxKeyLen int) (err error) {
 	for _, it := range *p {
-		err = it.Dump(w, readable)
+		err = it.Dump(w, readable, maxKeyLen)
 		if err != nil {
 			return
 		}
@@ -159,11 +159,11 @@ func NewMeasureData(count int) MeasureData {
 
 type MeasureData []*SpanData
 
-func (p *SpanData) Print(readable bool) (err error) {
-	return p.Dump(os.Stdout, readable)
+func (p *SpanData) Print(readable bool, maxKeyLen int) (err error) {
+	return p.Dump(os.Stdout, readable, maxKeyLen)
 }
 
-func (p *SpanData) Dump(w io.Writer, readable bool) (err error) {
+func (p *SpanData) Dump(w io.Writer, readable bool, maxKeyLen int) (err error) {
 	if p.Time == 0 {
 		return
 	}
@@ -182,7 +182,7 @@ func (p *SpanData) Dump(w io.Writer, readable bool) (err error) {
 	sort.Strings(keys)
 	for _, k := range keys {
 		if readable {
-			_, err = w.Write([]byte(fmt.Sprintf("%s: %s\n", k, p.Data[k].Dump(readable))))
+			_, err = w.Write([]byte(fmt.Sprintf("%s: %s\n", base.Rpad(k, maxKeyLen), p.Data[k].Dump(readable))))
 		} else {
 			_, err = w.Write([]byte(fmt.Sprintf("%s %s\n", k, p.Data[k].Dump(readable))))
 		}

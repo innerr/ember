@@ -53,22 +53,8 @@ func (p *RpcHub) CmdRemote([]string) {
 }
 
 func (p *RpcHub) help(fns []rpc.FnProto) {
-	types := func(names []string, types []string, lb, rb string) string {
-		str := lb
-		for i, name := range names {
-			str += types[i] + " " + name
-			if i + 1 != len(names) {
-				str += ", "
-			}
-		}
-		return str + rb
-	}
-
 	for _, fn := range fns {
-		fmt.Printf("  %s%v => %v\n",
-			fn.Name,
-			types(fn.ArgNames, fn.ArgTypes, "(", ")"),
-			types(fn.ReturnNames, fn.ReturnTypes, "(", ")"))
+		fmt.Printf("  " + fn.String())
 	}
 }
 
@@ -97,7 +83,7 @@ func (p *RpcHub) CmdCall(args []string) {
 
 func (p *RpcHub) CmdStatus(args []string) {
 	data, err := p.client.Measure.Sync(0)
-	err = data.Dump(os.Stdout, true)
+	err = data.Dump(os.Stdout, true, 40)
 	Check(err)
 }
 

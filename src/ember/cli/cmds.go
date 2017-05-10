@@ -7,6 +7,7 @@ import (
 )
 
 type Cmd func([]string)
+//type Cmd func([]string)error
 
 type Cmds struct {
 	path     string

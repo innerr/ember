@@ -1,9 +1,28 @@
 package rpc
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 )
+
+func (p FnProto) String() string {
+	return fmt.Sprintf("%s%v => %v",
+		p.Name,
+		types(p.ArgNames, p.ArgTypes, "(", ")"),
+		types(p.ReturnNames, p.ReturnTypes, "(", ")"))
+}
+
+func types(names []string, types []string, lb, rb string) string {
+	str := lb
+	for i, name := range names {
+		str += types[i] + " " + name
+		if i + 1 != len(names) {
+			str += ", "
+		}
+	}
+	return str + rb
+}
 
 func NewFnProto(fn reflect.Value, tag reflect.StructTag, name string) (p FnProto) {
 	p = FnProto{Name: name}

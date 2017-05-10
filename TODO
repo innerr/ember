@@ -3,9 +3,10 @@ docs
 rpc hub
 http detail status => 599 + body
 
-demo: no rpc hub
+demo: rpc hub
 common client
 
+measure interval
 measure data merge: test
 bench mark
 cluster status
